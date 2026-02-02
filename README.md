@@ -4,6 +4,8 @@ This repository shows how I approached a quality and testing challenge for an ar
 
 The goal was not to force bugs or look for artificial failures, but to understand how the product behaves in realistic scenarios, identify risks that could easily go unnoticed, and design tests that help prevent future issues.
 
+*High-level visual overview of explored test areas and quality focus.*
+
 ![Test overview](assets/test-matrix-overview.png)
 
 ---
@@ -48,6 +50,17 @@ An explicit error or at least a warning indicating a loss of precision.
 
 **Severity**: High
 
+**Possible cause / hint**
+
+The calculator may be relying on a numeric type or parsing strategy that loses precision when handling very large values.  
+Instead of throwing an error or warning, the operation returns a rounded or truncated result that appears valid at first glance.
+
+This suggests that:
+- Large numbers may be implicitly converted to a floating-point representation.
+- There is no explicit validation or guardrail for numeric limits.
+- Precision loss is not being surfaced to the user.
+
+
 ---
 
 ### Bug 2 – Ambiguous numeric input formats
@@ -69,6 +82,15 @@ Error: Invalid argument. Must be a numeric value.
 The system correctly rejects these values, but it does not clearly document which numeric formats are supported. This can lead to confusion for users or automated integrations.
 
 **Severity**: Medium
+
+**Possible cause / hint**
+
+Input validation appears to reject ambiguous numeric formats, but the rules for accepted formats are not clearly defined or documented.
+
+This could indicate that:
+- The CLI relies on a strict numeric parser without explicit user-facing guidance.
+- Some edge formats are caught by validation, but others may behave inconsistently.
+- Consumers of the CLI may not know which numeric representations are officially supported.
 
 ---
 
@@ -112,6 +134,15 @@ Below is the full test matrix of executed cases.
 | TC-11 | Exploratory | add 1e2 5                   | OK                  |
 | TC-12 | Exploratory | subtract -5 -3              | OK                  |
 | TC-13 | Exploratory | divide 1 0                  | OK (expected error) |
+
+## Other scenarios explored
+
+In addition to the table above, the following inputs were explored and did not result in bugs:
+- Scientific notation (e.g., `add 1e2 5`)
+- Mixed float and integer values
+- Negative inputs in combinations
+- Division by zero with appropriate messaging
+These reinforce the stability of expected behavior while documenting the scope of testing.
 
 ---
 
