@@ -4,6 +4,8 @@ This repository shows how I approached a quality and testing challenge for an ar
 
 The goal was not to force bugs or look for artificial failures, but to understand how the product behaves in realistic scenarios, identify risks that could easily go unnoticed, and design tests that help prevent future issues.
 
+![Test overview](assets/test-matrix-overview.png)
+
 ---
 
 ## 1. Summary
@@ -158,8 +160,6 @@ git commit -m "Initial findings and quality assessment"
 git add tests/cli-tests.sh
 git commit -m "Add basic CLI automation tests"
 ```
-
-Small, descriptive commits make the work easier to review and discuss.
 
 ---
 
