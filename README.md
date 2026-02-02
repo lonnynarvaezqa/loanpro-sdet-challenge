@@ -15,7 +15,6 @@ While unit tests already exist, this challenge focuses on **additional
 testing strategies** such as exploratory testing, edge-case analysis,
 automation, and CLI contract validation.
 
-*High-level visual overview of explored test areas and quality focus.*
 
 ![Test overview](assets/test-matrix-overview.png)
 
@@ -38,8 +37,6 @@ The evaluation was performed using the following strategies## Challenge Goals
 -   Go beyond happy-path testing and existing unit coverage
 
 ------------------------------------------------------------------------
-
-## Test Approach
 
 The evaluation included:
 
