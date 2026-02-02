@@ -1,6 +1,8 @@
 # LoanPro Calculator -- SDET Coding Challenge
 
-## Overview
+![Test overview](assets/test-matrix-overview.png)
+
+## 1. Overview
 
 This repository contains my solution to the **LoanPro SDET Coding
 Challenge**. The goal of this exercise is to evaluate an existing
@@ -14,9 +16,6 @@ arithmetic operations: `add`, `subtract`, `multiply`, and `divide`.
 While unit tests already exist, this challenge focuses on **additional
 testing strategies** such as exploratory testing, edge-case analysis,
 automation, and CLI contract validation.
-
-
-![Test overview](assets/test-matrix-overview.png)
 
 ---
 
@@ -35,8 +34,6 @@ The evaluation was performed using the following strategies## Challenge Goals
 -   Use any means necessary to uncover bugs and unexpected behaviors
 -   Evaluate correctness, reliability, and predictability
 -   Go beyond happy-path testing and existing unit coverage
-
-------------------------------------------------------------------------
 
 The evaluation included:
 
@@ -64,9 +61,7 @@ challenge.
 
 ------------------------------------------------------------------------
 
-## 2. Findings
-
-## Findings vs Risks
+## 2. Findings vs Risks
 
 ### Findings (Observed Behavior)
 
@@ -176,13 +171,57 @@ This could indicate that:
 
 ---
 
-## 3. Risks and improvement areas
+## 3. Improvement areas
 
 These points are not current bugs, but they represent real quality risks:
 
 - The output format (`Result: X`) is not defined as a stable contract.
 - There is no machine-readable output option.
 - Exit codes are not documented.
+
+## Exit Codes & CLI Contract Testing
+
+### Current State
+
+* Exit codes are not documented
+* Success and failure cases may return the same exit code
+* Consumers must rely on stdout parsing, which is fragile
+
+### Recommended Exit Code Contract
+
+| Exit Code | Meaning                    |
+| --------- | -------------------------- |
+| 0         | Success                    |
+| 1         | Invalid input              |
+| 2         | Unsupported operation      |
+| 3         | Arithmetic error           |
+| 4         | System or unexpected error |
+
+### Example Contract Test
+
+```bash
+docker run --rm loanpro-calculator-cli add 1 1
+echo $?  # Expected: 0
+```
+
+```bash
+docker run --rm loanpro-calculator-cli add 1 one
+echo $?  # Expected: non-zero
+```
+
+Defining and validating this contract would significantly improve reliability and integration safety.
+
+---
+
+## What I Would Test Next (Production Scenario)
+
+If this calculator were preparing for production use, I would extend testing in the following areas:
+
+* Fuzz testing with randomized numeric inputs
+* Stress and repeated execution tests
+* Backward compatibility testing between versions
+* Locale and environment variation testing
+* Observability (stderr vs stdout, verbose/debug modes)
 
 ---
 
@@ -283,50 +322,6 @@ This exercise reflects a practical testing approach:
 - Real bugs were found without forcing unrealistic scenarios.
 - Quality risks affecting maintainability and automation were identified.
 - Simple but effective automation was implemented.
-
-## Exit Codes & CLI Contract Testing
-
-### Current State
-
-* Exit codes are not documented
-* Success and failure cases may return the same exit code
-* Consumers must rely on stdout parsing, which is fragile
-
-### Recommended Exit Code Contract
-
-| Exit Code | Meaning                    |
-| --------- | -------------------------- |
-| 0         | Success                    |
-| 1         | Invalid input              |
-| 2         | Unsupported operation      |
-| 3         | Arithmetic error           |
-| 4         | System or unexpected error |
-
-### Example Contract Test
-
-```bash
-docker run --rm loanpro-calculator-cli add 1 1
-echo $?  # Expected: 0
-```
-
-```bash
-docker run --rm loanpro-calculator-cli add 1 one
-echo $?  # Expected: non-zero
-```
-
-Defining and validating this contract would significantly improve reliability and integration safety.
-
----
-
-## What I Would Test Next (Production Scenario)
-
-If this calculator were preparing for production use, I would extend testing in the following areas:
-
-* Fuzz testing with randomized numeric inputs
-* Stress and repeated execution tests
-* Backward compatibility testing between versions
-* Locale and environment variation testing
-* Observability (stderr vs stdout, verbose/debug modes)
 
 ---
 
