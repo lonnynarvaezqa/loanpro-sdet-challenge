@@ -90,18 +90,11 @@ Known issues explicitly listed in the challenge description
 (e.g. division by zero, \>16-digit precision, NaN/Infinity) were
 intentionally excluded.
 
-  --------------------------------------------------------------------------------------------------
-  ID        Operation   Steps to Reproduce              Expected Result  Actual Result   Notes
-  --------- ----------- ------------------------------- ---------------- --------------- -----------
-  BUG-001   multiply    `multiply 9999999999999999 2`   Error or warning Rounded but     Silent
-                                                        about precision  valid-looking   precision
-                                                        loss             result          loss
+| ID      | Operation     | Steps to Reproduce            | Expected Result                          | Actual Result                    | Notes                      |
+| ------- | ------------- | ----------------------------- | ---------------------------------------- | -------------------------------- | -------------------------- |
+| BUG-001 | multiply      | `multiply 9999999999999999 2` | Error or warning about precision loss    | Rounded but valid-looking result | Silent precision loss      |
+| BUG-002 | input parsing | `add --5 3`, `add +-5 3`      | Clear documentation of supported formats | Generic error without guidance   | Ambiguous numeric contract |
 
-  BUG-002   input       `add --5 3`, `add +-5 3`        Clear            Generic error   Ambiguous
-            parsing                                     documentation of without         numeric
-                                                        supported        guidance        contract
-                                                        formats                          
-  --------------------------------------------------------------------------------------------------
 
 ### Bug 1 – Silent overflow in multiplication
 
