@@ -1,8 +1,19 @@
-# LoanPro Calculator – SDET Challenge
+# LoanPro Calculator -- SDET Coding Challenge
 
-This repository shows how I approached a quality and testing challenge for an arithmetic calculator CLI distributed as a Docker image. I intentionally treated this exercise as I would in a real work environment, not as an academic assignment.
+## Overview
 
-The goal was not to force bugs or look for artificial failures, but to understand how the product behaves in realistic scenarios, identify risks that could easily go unnoticed, and design tests that help prevent future issues.
+This repository contains my solution to the **LoanPro SDET Coding
+Challenge**. The goal of this exercise is to evaluate an existing
+calculator CLI from a **Software Development Engineer in Test (SDET)**
+perspective: uncovering defects, identifying quality risks, and
+assessing production readiness.
+
+The calculator is delivered as a Dockerized CLI supporting basic
+arithmetic operations: `add`, `subtract`, `multiply`, and `divide`.
+
+While unit tests already exist, this challenge focuses on **additional
+testing strategies** such as exploratory testing, edge-case analysis,
+automation, and CLI contract validation.
 
 *High-level visual overview of explored test areas and quality focus.*
 
@@ -10,21 +21,95 @@ The goal was not to force bugs or look for artificial failures, but to understan
 
 ---
 
-## 1. Summary
+## Goals of the Challenge
 
-After running functional tests and several edge-case scenarios:
-
-- The system behaves correctly in most expected cases.
-- **Two real issues were identified**:
-  - A silent precision error when working with very large numbers.
-  - Ambiguity around which numeric input formats are considered valid.
-- No additional critical bugs were found without forcing unrealistic scenarios.
-
-Based on these results, the focus shifted to understanding quality risks and adding simple automation to help catch regressions.
+* Use any means necessary to uncover bugs and unexpected behaviors
+* Evaluate correctness, reliability, and predictability
+* Think beyond happy-path testing and unit coverage
 
 ---
 
+## Test Approach
+
+The evaluation was performed using the following strategies## Challenge Goals
+
+-   Use any means necessary to uncover bugs and unexpected behaviors
+-   Evaluate correctness, reliability, and predictability
+-   Go beyond happy-path testing and existing unit coverage
+
+------------------------------------------------------------------------
+
+## Test Approach
+
+The evaluation included:
+
+-   Functional testing of all supported operations
+-   Exploratory and edge-case testing
+-   Risk-based analysis focused on production usage
+-   Lightweight automation using Docker and Bash
+-   Validation of CLI behavior (output, errors, exit codes)
+
+All tests were executed using the official Docker image provided in the
+challenge.
+
+------------------------------------------------------------------------
+
+## Summary of Results
+
+-   The calculator behaves correctly in most expected scenarios.
+-   **Two real issues were identified** without forcing unrealistic
+    inputs:
+    1.  Silent precision loss when operating on very large numbers.
+    2.  Ambiguity around supported numeric input formats.
+-   No additional critical bugs were found beyond these cases.
+-   Several **quality risks** were identified that could impact
+    automation and integration.
+
+------------------------------------------------------------------------
+
 ## 2. Findings
+
+## Findings vs Risks
+
+### Findings (Observed Behavior)
+
+-   Core arithmetic operations work correctly for standard inputs.
+-   Output is plain text and unstructured.
+-   Error messages are inconsistent and not machine-readable.
+-   Precision rules are not explicitly documented.
+-   Exit codes are not documented or clearly differentiated.
+
+### Risks (Production Impact)
+
+-   **Automation risk**: Fragile integration due to lack of structured
+    output and exit code contract.
+-   **Silent failures**: Incorrect results may go unnoticed if consumers
+    rely only on stdout.
+-   **Ambiguity risk**: Undefined numeric and formatting rules increase
+    misuse.
+-   **Scalability risk**: Adding new operations without a clear CLI
+    contract increases regression risk.
+
+------------------------------------------------------------------------
+
+## Bug Report
+
+Known issues explicitly listed in the challenge description
+(e.g. division by zero, \>16-digit precision, NaN/Infinity) were
+intentionally excluded.
+
+  --------------------------------------------------------------------------------------------------
+  ID        Operation   Steps to Reproduce              Expected Result  Actual Result   Notes
+  --------- ----------- ------------------------------- ---------------- --------------- -----------
+  BUG-001   multiply    `multiply 9999999999999999 2`   Error or warning Rounded but     Silent
+                                                        about precision  valid-looking   precision
+                                                        loss             result          loss
+
+  BUG-002   input       `add --5 3`, `add +-5 3`        Clear            Generic error   Ambiguous
+            parsing                                     documentation of without         numeric
+                                                        supported        guidance        contract
+                                                        formats                          
+  --------------------------------------------------------------------------------------------------
 
 ### Bug 1 – Silent overflow in multiplication
 
@@ -201,5 +286,57 @@ This exercise reflects a practical testing approach:
 - Real bugs were found without forcing unrealistic scenarios.
 - Quality risks affecting maintainability and automation were identified.
 - Simple but effective automation was implemented.
+
+## Exit Codes & CLI Contract Testing
+
+### Current State
+
+* Exit codes are not documented
+* Success and failure cases may return the same exit code
+* Consumers must rely on stdout parsing, which is fragile
+
+### Recommended Exit Code Contract
+
+| Exit Code | Meaning                    |
+| --------- | -------------------------- |
+| 0         | Success                    |
+| 1         | Invalid input              |
+| 2         | Unsupported operation      |
+| 3         | Arithmetic error           |
+| 4         | System or unexpected error |
+
+### Example Contract Test
+
+```bash
+docker run --rm loanpro-calculator-cli add 1 1
+echo $?  # Expected: 0
+```
+
+```bash
+docker run --rm loanpro-calculator-cli add 1 one
+echo $?  # Expected: non-zero
+```
+
+Defining and validating this contract would significantly improve reliability and integration safety.
+
+---
+
+## What I Would Test Next (Production Scenario)
+
+If this calculator were preparing for production use, I would extend testing in the following areas:
+
+* Fuzz testing with randomized numeric inputs
+* Stress and repeated execution tests
+* Backward compatibility testing between versions
+* Locale and environment variation testing
+* Observability (stderr vs stdout, verbose/debug modes)
+
+---
+
+## Final Notes
+
+This challenge was approached not only to identify bugs, but to evaluate the calculator as a production-ready tool. The focus was on correctness, predictability, and long-term maintainability from an SDET perspective.
+
+The intent is to demonstrate how testing can reduce risk, not just validate functionality.
 
 This is the type of work I would expect to complete before releasing a component to production.
