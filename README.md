@@ -293,6 +293,7 @@ You can find the full script here:
 ```bash
 chmod +x tests/cli-tests.sh
 ./tests/cli-tests.sh
+```
 ---
 
 ## 6. Repository setup and commits
